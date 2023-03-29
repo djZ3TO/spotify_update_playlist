@@ -1,0 +1,45 @@
+import datetime
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
+
+# Enter your Spotify API credentials
+client_id = 'f3040b500aea4a0facf15ec5fcca9471'
+client_secret = 'b233e49ff30849a1902748ab0677016b'
+redirect_uri = 'http://localhost:8888/callback'
+
+# Authenticate and authorize access to your Spotify account
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri))
+
+# Get the songs from multiple playlists released in the current month and add them to an existing playlist without duplicates
+destination_playlist_uri = 'spotify:playlist:5KGnZ9DpRvqkOTUR93Ggi2'  # Replace with the URI of the destination playlist
+playlist_uris = ['spotify:playlist:0hyw7x82GfwFkQQdszLOx8']  # Replace with a list of playlist URIs
+existing_songs = [track["track"]["uri"] for track in sp.playlist_items(playlist_uris, additional_types=('track',))]
+
+# Get the current month and year
+now = datetime.datetime.now()
+current_month = now.month
+current_year = now.year
+
+# Counter for the number of songs added to the destination playlist
+songs_added = 0
+
+for playlist_uri in playlist_uris:
+    source_playlist = sp.playlist_items(playlist_uri)
+    for item in source_playlist["items"]:
+        track = item["track"]
+        # Get the release date of the track
+        release_date = track["album"]["release_date"]
+        # Get the year and month of the release date
+        year, month, day = release_date.split('-')
+        # Check if the track was released in the current month and year
+        if int(year) == current_year and int(month) == current_month:
+            # Check if the track is not already in the destination playlist
+            if track["uri"] not in existing_songs:
+                sp.playlist_add_items(destination_playlist_uri, [track["uri"]])
+                existing_songs.append(track["uri"])
+                songs_added += 1
+
+print(f'{songs_added} songs added to the destination playlist.')
+
+
+
