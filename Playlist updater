@@ -3,8 +3,8 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 # Enter your Spotify API credentials
-client_id = 'f3040b500aea4a0facf15ec5fcca9471'
-client_secret = 'b233e49ff30849a1902748ab0677016b'
+client_id = 'client id'
+client_secret = 'client secret'
 redirect_uri = 'http://localhost:8888/callback'
 
 # Authenticate and authorize access to your Spotify account
